@@ -49,7 +49,6 @@ public class Goods implements Serializable {
     private String name;
     @Basic(optional = false)
 //    @NotNull
-    @Size(max = 255)
     @Column(name = "quantity")
     private int quantity;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation

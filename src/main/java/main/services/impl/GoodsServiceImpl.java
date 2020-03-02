@@ -27,56 +27,80 @@ public class GoodsServiceImpl implements GoodsServiceInter {
 
     @Override
     public List<Goods> getAllGoods() {
-        List<Goods> goods = goodsRepository.findAll();
-        return goods;
+        try {
+            List<Goods> goods = goodsRepository.findAll();
+            return goods;
+        } catch (Exception e) {
+            System.out.println("There are not any goods in database");
+        }
+
+        return null;
     }
 
     @Override
     public Goods getGoodsById(Integer id) {
-        Goods goods = null;
         try {
-            goods = goodsRepository.findById(id).get();
+            Goods goods = goodsRepository.findById(id).get();
+            return goods;
         } catch (Exception e) {
-//            System.out.println("No such element founded");
-            System.out.println(e.getLocalizedMessage());
+            System.out.println("No such element founded");
         }
-        
-        return goods;
+
+        return null;
     }
 
     @Override
     public boolean addGoods(GoodsDTO goodsDTO) {
-        Goods g = new Goods();
-        g.setName(goodsDTO.getName());
-        g.setQuantity(goodsDTO.getQuantity());
-        g.setCost(goodsDTO.getCost());
-        
-        goodsRepository.save(g);
-        return true;
-        
+        try {
+            Goods g = new Goods();
+            g.setName(goodsDTO.getName());
+            g.setQuantity(goodsDTO.getQuantity());
+            g.setCost(goodsDTO.getCost());
+
+            goodsRepository.save(g);
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("Failed in insert operation ");
+        }
+
+        return false;
+
     }
 
     @Override
     public boolean updateGoods(Integer id, GoodsDTO goodsDTO) {
-        Goods g =  goodsRepository.findById(id).get();
-        if(goodsDTO.getName()!=null && !goodsDTO.getName().isEmpty()){
-            g.setName(goodsDTO.getName());
-        }
-        if(goodsDTO.getQuantity()!=null){
-            g.setQuantity(goodsDTO.getQuantity());
-        }
-        if(goodsDTO.getCost()!=null){
-            g.setCost(goodsDTO.getCost());
+        try {
+            Goods g = goodsRepository.findById(id).get();
+            if (goodsDTO.getName() != null && !goodsDTO.getName().isEmpty()) {
+                g.setName(goodsDTO.getName());
+            }
+            if (goodsDTO.getQuantity() != null) {
+                g.setQuantity(goodsDTO.getQuantity());
+            }
+            if (goodsDTO.getCost() != null) {
+                g.setCost(goodsDTO.getCost());
+            }
+
+            goodsRepository.save(g);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Failed in update operation");
         }
         
-        goodsRepository.save(g);
-        return true;
+        return false;
     }
 
     @Override
     public boolean deleteGoods(Integer id) {
-        goodsRepository.deleteById(id);
-        return true;
+        try {
+            goodsRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Failed in delete operation");
+        }
+        
+        return false;
     }
 
 }
