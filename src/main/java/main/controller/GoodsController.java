@@ -10,6 +10,7 @@ import main.dto.GoodsDTO;
 import main.dto.ResponseDTO;
 import main.entities.Goods;
 import main.mapper.GoodsMapper;
+import main.services.inter.GoodsFromServer;
 import main.services.inter.GoodsServiceInter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +21,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  * @author murad_isgandar
  */
+// Rest Api client
 @RestController
 @RequestMapping("/goods")
 public class GoodsController {
 
     private final GoodsServiceInter goodsServiceInter;
 
-    public GoodsController(GoodsServiceInter goodsServiceInter) {
+    private final GoodsFromServer goodsFromServer;
+
+    public GoodsController(GoodsServiceInter goodsServiceInter, GoodsFromServer goodsFromServer) {
         this.goodsServiceInter = goodsServiceInter;
+        this.goodsFromServer = goodsFromServer;
     }
 
     @GetMapping
@@ -69,22 +75,36 @@ public class GoodsController {
 
     @PutMapping(value = "/{id}")
     public ResponseEntity updateGoods(@PathVariable(value = "id") Integer id, @RequestBody GoodsDTO goodsDTO) {
-        if(goodsServiceInter.updateGoods(id, goodsDTO)){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(("Goods by id = "+ id + " are updated successfully"), 200, goodsServiceInter.getGoodsById(id)));
-        }
-        else{
+        if (goodsServiceInter.updateGoods(id, goodsDTO)) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(("Goods by id = " + id + " are updated successfully"), 200, goodsServiceInter.getGoodsById(id)));
+        } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO("Failed in update operation", 500, goodsDTO));
         }
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity deleteGoods(@PathVariable(value = "id") Integer id) {
-        if(goodsServiceInter.deleteGoods(id)){
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(("Goods by id = "+ id + " are deleted successfully"), 200, ("Goods' id = "+id)));
-        }
-        else{
+        if (goodsServiceInter.deleteGoods(id)) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(("Goods by id = " + id + " are deleted successfully"), 200, ("Goods' id = " + id)));
+        } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO("Failed in delete operation", 500, null));
         }
     }
+
+    @GetMapping(value = "/{gName}/{quantity}")
+    public ResponseEntity sendGoods(@PathVariable(value = "gName") String name, @PathVariable(value = "quantity") Integer quantity) {
+        int quantityFromSupplier = goodsFromServer.sendGoods(name, quantity);
+        System.out.println("quantityFromSupplier " + quantityFromSupplier);
+        Goods goods = goodsServiceInter.increaseGoodsQuantity(name, quantityFromSupplier);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + name + " computer are recieved from supplier"), 200, goods));
+    }
+
+//    @GetMapping(value = "/{gId}/{quantity}")
+//    public ResponseEntity sellGoods(@PathVariable(value = "gId") Integer id, @PathVariable(value = "quantity") Integer quantity) {
+//        Goods goods = goodsServiceInter.decreaseGoodsQuantity(id, quantity);
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + goods.getName() + "computer are sold to customers"), 200, goods));
+//    }
 
 }

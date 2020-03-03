@@ -25,4 +25,8 @@ public interface GoodsServiceInter {
     
     public boolean deleteGoods(Integer id);
     
+    public Goods increaseGoodsQuantity(String name,Integer quantity); // for goods quantity receiving from supplier
+    
+    public Goods decreaseGoodsQuantity(Integer id ,Integer quantity); // for sell goods to customers
+    
 }

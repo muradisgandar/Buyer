@@ -6,12 +6,18 @@
 package main.services.inter;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  *
  * @author murad_isgandar
  */
-@FeignClient(value = "supplier", url = "http://localhost:8080")
+@FeignClient(value = "supplier", url = "http://localhost:8080/goods")
 public interface GoodsFromServer {
+    
+    @GetMapping(value = "/{gName}/{quantity}")
+    public Integer sendGoods(@PathVariable(value = "gName") String name, @PathVariable(value = "quantity") Integer quantity);
     
 }
