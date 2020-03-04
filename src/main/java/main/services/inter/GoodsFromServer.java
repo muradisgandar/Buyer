@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(value = "supplier", url = "http://localhost:8080/goods")
 public interface GoodsFromServer {
     
-    @GetMapping(value = "/{gName}/{quantity}")
-    public Integer sendGoods(@PathVariable(value = "gName") String name, @PathVariable(value = "quantity") Integer quantity);
+    @GetMapping(value = "/gName/{quantity}")
+    public Integer recieveGoods(@RequestParam(value = "gName") String name, @PathVariable(value = "quantity") Integer quantity);
     
 }

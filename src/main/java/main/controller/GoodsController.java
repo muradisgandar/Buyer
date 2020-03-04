@@ -91,20 +91,25 @@ public class GoodsController {
         }
     }
 
-    @GetMapping(value = "/{gName}/{quantity}")
-    public ResponseEntity sendGoods(@PathVariable(value = "gName") String name, @PathVariable(value = "quantity") Integer quantity) {
-        int quantityFromSupplier = goodsFromServer.sendGoods(name, quantity);
-        System.out.println("quantityFromSupplier " + quantityFromSupplier);
-        Goods goods = goodsServiceInter.increaseGoodsQuantity(name, quantityFromSupplier);
+    @GetMapping(value = "/gName/{quantity}")
+    public ResponseEntity recieveGoods(@RequestParam(value = "name") String name, @PathVariable(value = "quantity") Integer quantity) {
+        Integer quantityFromSupplier = goodsFromServer.recieveGoods(name, quantity);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + name + " computer are recieved from supplier"), 200, goods));
+//        System.out.println("quantityFromSupplier " + quantityFromSupplier);
+        if (quantityFromSupplier != null && quantityFromSupplier!=0) {
+            Goods goods = goodsServiceInter.increaseGoodsQuantity(name, quantityFromSupplier);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + name + " computers are recieved from supplier"), 200, goods));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO("There are not enough goods in supplier ", 500, false));
+        }
+
     }
 
-//    @GetMapping(value = "/{gId}/{quantity}")
-//    public ResponseEntity sellGoods(@PathVariable(value = "gId") Integer id, @PathVariable(value = "quantity") Integer quantity) {
-//        Goods goods = goodsServiceInter.decreaseGoodsQuantity(id, quantity);
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + goods.getName() + "computer are sold to customers"), 200, goods));
-//    }
+    @GetMapping(value = "/{gId}/{quantity}")
+    public ResponseEntity sellGoods(@PathVariable(value = "gId") Integer id, @PathVariable(value = "quantity") Integer quantity) {
+        Goods goods = goodsServiceInter.decreaseGoodsQuantity(id, quantity);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + goods.getName() + " computers are sold to customers"), 200, goods));
+    }
 
 }
