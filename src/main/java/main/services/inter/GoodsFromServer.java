@@ -18,6 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface GoodsFromServer {
     
     @GetMapping(value = "/gName/{quantity}")
-    public Integer recieveGoods(@RequestParam(value = "gName") String name, @PathVariable(value = "quantity") Integer quantity);
+    public Integer recieveGoods(@RequestParam(value = "name") String name, @PathVariable(value = "quantity") Integer quantity);
     
 }
