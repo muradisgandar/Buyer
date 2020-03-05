@@ -12,12 +12,12 @@ import main.entities.Goods;
 import main.mapper.GoodsMapper;
 import main.services.inter.GoodsFromServer;
 import main.services.inter.GoodsServiceInter;
+import main.tcpconnection.TCPClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,15 +63,6 @@ public class GoodsController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity addGoods(@RequestBody GoodsDTO goodsDTO) {
-        if (goodsServiceInter.addGoods(goodsDTO)) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO("Goods are inserted successfully", 200, goodsDTO));
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO("Failed in insert operation", 500, goodsDTO));
-        }
-
-    }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity updateGoods(@PathVariable(value = "id") Integer id, @RequestBody GoodsDTO goodsDTO) {
@@ -92,11 +83,14 @@ public class GoodsController {
     }
 
     @GetMapping(value = "/gName/{quantity}")
-    public ResponseEntity recieveGoods(@RequestParam(value = "name") String name, @PathVariable(value = "quantity") Integer quantity) {
+    public ResponseEntity recieveGoods(@RequestParam(value = "name") String name, @PathVariable(value = "quantity") Integer quantity) throws Exception {
+        TCPClient.sendMessage("We need "+quantity+" "+name+" computers");
+        
         Integer quantityFromSupplier = goodsFromServer.recieveGoods(name, quantity);
+        TCPClient.recieveMessage(); // recieve message from server
 
-//        System.out.println("quantityFromSupplier " + quantityFromSupplier);
         if (quantityFromSupplier != null && quantityFromSupplier!=0) {
+            
             Goods goods = goodsServiceInter.increaseGoodsQuantity(name, quantityFromSupplier);
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + name + " computers are recieved from supplier"), 200, goods));
         } else {
