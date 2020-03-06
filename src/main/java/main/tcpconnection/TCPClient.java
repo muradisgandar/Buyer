@@ -22,34 +22,32 @@ public class TCPClient {
 
     private static Socket socket;
 
-
-    public static void startConnection() throws Exception{
-        String host = "localhost";
-        int port = 25000;
-        InetAddress address = InetAddress.getByName(host);
-        socket = new Socket(address, port);
+    public static void startConnection() throws Exception {
+            String host = "localhost";
+            int port = 6789;
+            InetAddress address = InetAddress.getByName(host);
+            socket = new Socket(address, port);
     }
 
-    public static void recieveMessage() throws Exception {
-        InputStream is = socket.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-        System.out.println(socket);
-        String message = br.readLine();
-        System.out.println("Received from server: " + message + "\n");
+    public static void recieveMessage() throws Exception{
+            
+            InputStream is = socket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+            String message = br.readLine();
+            
+            System.out.println("Received from server: " + message + "\n");
 
     }
 
-    public static void sendMessage(String message) throws Exception {
+    public static void sendMessage(String message) throws Exception{
 
-        OutputStream os = socket.getOutputStream();
-        OutputStreamWriter osw = new OutputStreamWriter(os);
-        BufferedWriter bw = new BufferedWriter(osw);
-
-
-        String sendMessage = message + "\n";
-        bw.write(sendMessage);
-        bw.flush();
+            OutputStream os = socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os);
+            BufferedWriter bw = new BufferedWriter(osw);
+            String sendMessage = message + "\n";
+            bw.write(sendMessage);
+            bw.flush();
     }
 
 }

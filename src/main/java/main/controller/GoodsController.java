@@ -5,6 +5,7 @@
  */
 package main.controller;
 
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import main.dto.GoodsDTO;
 import main.dto.ResponseDTO;
@@ -43,6 +44,7 @@ public class GoodsController {
     }
 
     @GetMapping
+    @ApiOperation(value = "get all goods from database")
     public ResponseEntity goods() {
         List<Goods> goods = goodsServiceInter.getAllGoods();
         if (goods != null && !goods.isEmpty()) {
@@ -54,6 +56,7 @@ public class GoodsController {
     }
 
     @GetMapping(path = "/{id}")
+    @ApiOperation(value = "get goods which are defined by id from database")
     public ResponseEntity goodsById(@PathVariable(value = "id") Integer id) {
         Goods goods = goodsServiceInter.getGoodsById(id);
         if (goods != null) {
@@ -65,6 +68,7 @@ public class GoodsController {
 
 
     @PutMapping(value = "/{id}")
+    @ApiOperation(value = "update goods which are identified by sending id")
     public ResponseEntity updateGoods(@PathVariable(value = "id") Integer id, @RequestBody GoodsDTO goodsDTO) {
         if (goodsServiceInter.updateGoods(id, goodsDTO)) {
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(("Goods by id = " + id + " are updated successfully"), 200, goodsServiceInter.getGoodsById(id)));
@@ -74,6 +78,7 @@ public class GoodsController {
     }
 
     @DeleteMapping(value = "/{id}")
+    @ApiOperation(value = "delete goods which are identified by sending id")
     public ResponseEntity deleteGoods(@PathVariable(value = "id") Integer id) {
         if (goodsServiceInter.deleteGoods(id)) {
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(("Goods by id = " + id + " are deleted successfully"), 200, ("Goods' id = " + id)));
@@ -83,16 +88,16 @@ public class GoodsController {
     }
 
     @GetMapping(value = "/gName/{quantity}")
+    @ApiOperation(value = "send request to server for recieving goods")
     public ResponseEntity recieveGoods(@RequestParam(value = "name") String name, @PathVariable(value = "quantity") Integer quantity) throws Exception {
         TCPClient.sendMessage("We need "+quantity+" "+name+" computers");
         
         Integer quantityFromSupplier = goodsFromServer.recieveGoods(name, quantity);
         TCPClient.recieveMessage(); // recieve message from server
-
+        
         if (quantityFromSupplier != null && quantityFromSupplier!=0) {
-            
             Goods goods = goodsServiceInter.increaseGoodsQuantity(name, quantityFromSupplier);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantity + " " + name + " computers are recieved from supplier"), 200, goods));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO((quantityFromSupplier + " " + name + " computers are recieved from supplier"), 200, goods));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDTO("There are not enough goods in supplier ", 500, false));
         }
@@ -100,6 +105,7 @@ public class GoodsController {
     }
 
     @GetMapping(value = "/{gId}/{quantity}")
+    @ApiOperation(value = "get goods from database for selling to customers")
     public ResponseEntity sellGoods(@PathVariable(value = "gId") Integer id, @PathVariable(value = "quantity") Integer quantity) {
         Goods goods = goodsServiceInter.decreaseGoodsQuantity(id, quantity);
 
